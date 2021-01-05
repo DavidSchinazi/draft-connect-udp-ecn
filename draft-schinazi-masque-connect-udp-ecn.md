@@ -82,20 +82,20 @@ indicated support for it in their CONNECT-UDP request and response.
 
 If a client supports this extension and HTTP/3 datagrams
 {{!H3DGRAM=I-D.schinazi-quic-h3-datagram}}, it can attempt to use datagrams for
-ECN information. This is done by allocating four datagram flow identifiers
-(as opposed to one in traditional CONNECT-UDP) and communicating them to the
-proxy using parameters on the "Datagram-Flow-Id" header. These parameters are
-"ect0", "ect1" and "ce". For example:
+ECN information. This is done by allocating four datagram flow identifiers (as
+opposed to one in traditional CONNECT-UDP) and communicating them to the proxy
+using named elements on the "Datagram-Flow-Id" header. These names are
+"ecn-ect0", "ecn-ect1", and "ecn-ce". For example:
 
 ~~~
-  Datagram-Flow-Id = 100; ect0=102; ect1=104; ce=106
+  Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
 ~~~
 
 If the proxy wishes to support datagram encoding of this extension, it echoes
-those parameters in its CONNECT-UDP response. The main flow identifier now
-represents Not-ECT, whereas the one in "ect0" represents ECT(0), "ect1"
-represents ECT(1) and "ce" represents CE; see Section 5 of {{ECN}} for
-the definition of these IP header fields.
+those named elements in its CONNECT-UDP response. The unnamed element now
+represents Not-ECT, whereas the one in "ecn-ect0" represents ECT(0), "ecn-ect1"
+represents ECT(1) and "ecn-ce" represents CE; see Section 5 of {{ECN}} for the
+definition of these IP header fields.
 
 When the proxy receives a datagram from the given flow identifier, it sets
 the IP packet's ECN bits accordingly on the UDP packet it sends to the target.
@@ -135,14 +135,16 @@ However, in some cases, an HTTP request may travel across multiple HTTP
 connections if there are HTTP intermediaries involved; see Section 2.3 of
 {{!RFC7230}}.
 
-Intermediaries that support this extension and HTTP/3 datagrams MUST
-negotiate flow identifiers separately on the client-facing and server-facing
-connections. This is accomplished by having the intermediary parse the
+Intermediaries that support this extension and HTTP/3 datagrams MUST negotiate
+all four flow identifiers separately on the client-facing and server-facing
+connections. This is accomplished by having the intermediary parse the unnamed
+element and the "ecn-ect0", "ecn-ect1", and "ecn-ce" named elements in the
 "Datagram-Flow-Id" header on all CONNECT-UDP requests it receives, and sending
-the same value in the "Datagram-Flow-Id" header on the response. The
-intermediary will perform this individualy for all the parameters defined by
-this extension as well, in addition to the rules in the "HTTP Intermediaries"
-section of {{CONNECT-UDP}}.
+the same four flow identifiers in the "Datagram-Flow-Id" header on the response.
+
+Intermediaries MUST NOT send the "ECN" header with a value of 1 to the client
+on its response unless it has received that same value in the response it
+received from the server.
 
 
 # Security Considerations {#security}
@@ -165,6 +167,25 @@ This document will request IANA to register the "ECN" header in the
   +-------------------+----------+--------+---------------+
   |        ECN        |   http   |  std   | This document |
   +-------------------+----------+--------+---------------+
+~~~
+
+
+## Flow Identifier Parameters {#iana-params}
+
+This document will request IANA to register the "ecn-ect0", "ecn-ect1", and
+"ecn-ce" flow identifier parameters in the "HTTP Datagram Flow Identifier
+Parameters" registry (see {{H3DGRAM}}):
+
+~~~
+  +----------+-------------------------+---------+---------------+
+  |   Key    |       Description       | Is Name |   Reference   |
+  +----------+-------------------------+---------+---------------+
+  | ecn-ect0 | UDP payload with ECT(0) |   Yes   | This document |
+  +----------+-------------------------+---------+---------------+
+  | ecn-ect1 | UDP payload with ECT(1) |   Yes   | This document |
+  +----------+-------------------------+---------+---------------+
+  | ecn-ce   | UDP payload with CE     |   Yes   | This document |
+  +----------+-------------------------+---------+---------------+
 ~~~
 
 

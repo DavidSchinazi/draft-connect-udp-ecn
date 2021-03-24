@@ -4,8 +4,8 @@
 
 Network Working Group                                        D. Schinazi
 Internet-Draft                                                Google LLC
-Intended status: Standards Track                        13 December 2020
-Expires: 16 June 2021
+Intended status: Standards Track                           24 March 2021
+Expires: 25 September 2021
 
 
                     An ECN Extension to CONNECT-UDP
@@ -44,11 +44,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 June 2021.
+   This Internet-Draft will expire on 25 September 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -71,7 +71,6 @@ Table of Contents
    6.  Security Considerations
    7.  IANA Considerations
      7.1.  HTTP Header
-     7.2.  Stream Chunk Type Registration
    8.  Normative References
    Acknowledgments
    Author's Address
@@ -98,13 +97,14 @@ Table of Contents
 2.  ECN Header Definition
 
    "ECN" is a Item Structured Header [STRUCT-HDR].  Its value MUST be a
-   Boolean.  Its ABNF is:
+   Token.  Its ABNF is:
 
-     ECN = sf-boolean
+     ECN = sf-token
 
    The "ECN" header indicates whether the sender supports this
-   extension.  A value of 1 indicates support whereas a value of 0 (or
-   the absence of the header) indicates lack of support.
+   extension.  A value of "supported" indicates support whereas a value
+   of "unsupported" (or the absence of the header) indicates lack of
+   support.
 
    Clients MUST NOT indicate support for this extension unless they know
    that the protocol running over UDP that is being proxied supports
@@ -125,16 +125,11 @@ Table of Contents
    it can attempt to use datagrams for ECN information.  This is done by
    allocating four datagram flow identifiers (as opposed to one in
    traditional CONNECT-UDP) and communicating them to the proxy using
-   parameters on the "Datagram-Flow-Id" header.  These parameters are
-   "ect0", "ect1" and "ce".  For example:
+   REGISTER_DATAGRAM_FLOW_ID HTTP/3 frames.  These frames carry the ECN
+   header with values that allow differentiating between ECN codepoints.
+   The values are "ect0", "ect1", and "ce".  For example:
 
-     Datagram-Flow-Id = 100; ect0=102; ect1=104; ce=106
-
-   If the proxy wishes to support datagram encoding of this extension,
-   it echoes those parameters in its CONNECT-UDP response.  The main
-   flow identifier now represents Not-ECT, whereas the one in "ect0"
-   represents ECT(0), "ect1" represents ECT(1) and "ce" represents CE;
-   see Section 5 of [ECN] for the definition of these IP header fields.
+     ECN = ect0
 
    When the proxy receives a datagram from the given flow identifier, it
    sets the IP packet's ECN bits accordingly on the UDP packet it sends
@@ -144,26 +139,8 @@ Table of Contents
 
 4.  Stream Encoding of Proxied UDP Packets
 
-   If HTTP/3 datagrams are not supported, the stream is used to convey
-   UDP payloads, and the CONNECT-UDP Stream Chunk Type is used to
-   indicate the values of the ECN bits, as defined below:
-
-     +-------+-----------------+-----------+
-     | Value |      Type       | ECN Field |
-     +-------+-----------------+-----------+
-     | 0x00  | UDP_PACKET      |  Not-ECT  |
-     +-------+-----------------+-----------+
-     | 0x31  | UDP_PACKET_ECT0 |  ECT(0)   |
-     +-------+-----------------+-----------+
-     | 0x32  | UDP_PACKET_ECT1 |  ECT(1)   |
-     +-------+-----------------+-----------+
-     | 0x33  | UDP_PACKET_CE   |  CE       |
-     +-------+-----------------+-----------+
-
-   The proxy then uses the the CONNECT-UDP Stream Chunk Type on received
-   UDP payloads to set the ECN bits on the IP packets it sends to the
-   target, and in the reverse direction to indicate which ECN bits
-   received from the target.
+   The RELIABLE_DATAGRAM HTTP/3 frame can be used to convey UDP
+   payloads.
 
 5.  HTTP Intermediaries
 
@@ -173,14 +150,16 @@ Table of Contents
    involved; see Section 2.3 of [RFC7230].
 
    Intermediaries that support this extension and HTTP/3 datagrams MUST
-   negotiate flow identifiers separately on the client-facing and
-   server-facing connections.  This is accomplished by having the
-   intermediary parse the "Datagram-Flow-Id" header on all CONNECT-UDP
-   requests it receives, and sending the same value in the "Datagram-
-   Flow-Id" header on the response.  The intermediary will perform this
-   individualy for all the parameters defined by this extension as well,
-   in addition to the rules in the "HTTP Intermediaries" section of
-   [CONNECT-UDP].
+   negotiate all four flow identifiers separately on the client-facing
+   and server-facing connections.  This is accomplished by having the
+   intermediary parse the REGISTER_DATAGRAM_FLOW_ID frames it receives
+   on all CONNECT-UDP streams, and sending the same four flow
+   identifiers in the REGISTER_DATAGRAM_FLOW_ID in the reverse
+   direction.
+
+   Intermediaries MUST NOT send the "ECN" header with a value of 1 to
+   the client on its response unless it has received that same value in
+   the response it received from the server.
 
 6.  Security Considerations
 
@@ -201,58 +180,45 @@ Table of Contents
      |        ECN        |   http   |  std   | This document |
      +-------------------+----------+--------+---------------+
 
-7.2.  Stream Chunk Type Registration
-
-   This document will request IANA to register the following entry in
-   the "CONNECT-UDP Stream Chunk Type" registry [CONNECT-UDP]:
-
-   +-------+-----------------+-------------------------+---------------+
-   | Value |      Type       |       Description       |   Reference   |
-   +-------+-----------------+-------------------------+---------------+
-   | 0x31  | UDP_PACKET_ECT0 | UDP payload with ECT(0) | This document |
-   +-------+-----------------+-------------------------+---------------+
-   | 0x32  | UDP_PACKET_ECT1 | UDP payload with ECT(1) | This document |
-   +-------+-----------------+-------------------------+---------------+
-   | 0x33  | UDP_PACKET_CE   | UDP payload with CE     | This document |
-   +-------+-----------------+-------------------------+---------------+
-
 8.  Normative References
 
    [CONNECT-UDP]
               Schinazi, D., "The CONNECT-UDP HTTP Method", Work in
               Progress, Internet-Draft, draft-ietf-masque-connect-udp-
-              00, 28 August 2020, <http://www.ietf.org/internet-drafts/
-              draft-ietf-masque-connect-udp-00.txt>.
+              03, 5 January 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
+              connect-udp-03.txt>.
 
    [ECN]      Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
               of Explicit Congestion Notification (ECN) to IP",
               RFC 3168, DOI 10.17487/RFC3168, September 2001,
-              <https://www.rfc-editor.org/info/rfc3168>.
+              <https://datatracker.ietf.org/doc/html/rfc3168>.
 
    [H3DGRAM]  Schinazi, D., "Using QUIC Datagrams with HTTP/3", Work in
               Progress, Internet-Draft, draft-schinazi-quic-h3-datagram-
-              05, 12 October 2020, <http://www.ietf.org/internet-drafts/
-              draft-schinazi-quic-h3-datagram-05.txt>.
+              05, 12 October 2020,
+              <https://datatracker.ietf.org/doc/html/draft-schinazi-
+              quic-h3-datagram-05.txt>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
+              <https://datatracker.ietf.org/doc/html/rfc2119>.
 
    [RFC7230]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
               Protocol (HTTP/1.1): Message Syntax and Routing",
               RFC 7230, DOI 10.17487/RFC7230, June 2014,
-              <https://www.rfc-editor.org/info/rfc7230>.
+              <https://datatracker.ietf.org/doc/html/rfc7230>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+              May 2017, <https://datatracker.ietf.org/doc/html/rfc8174>.
 
    [STRUCT-HDR]
               Nottingham, M. and P. Kamp, "Structured Field Values for
               HTTP", Work in Progress, Internet-Draft, draft-ietf-
               httpbis-header-structure-19, 3 June 2020,
-              <http://www.ietf.org/internet-drafts/draft-ietf-httpbis-
+              <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
               header-structure-19.txt>.
 
 Acknowledgments

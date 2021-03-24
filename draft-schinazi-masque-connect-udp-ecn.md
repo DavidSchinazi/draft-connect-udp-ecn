@@ -56,15 +56,15 @@ when, and only when, they appear in all capitals, as shown here.
 # ECN Header Definition {#header}
 
 "ECN" is a Item Structured Header
-{{!STRUCT-HDR=I-D.ietf-httpbis-header-structure}}. Its value MUST be a Boolean.
+{{!STRUCT-HDR=I-D.ietf-httpbis-header-structure}}. Its value MUST be a Token.
 Its ABNF is:
 
 ~~~
-  ECN = sf-boolean
+  ECN = sf-token
 ~~~
 
 The "ECN" header indicates whether the sender supports this extension. A value
-of 1 indicates support whereas a value of 0 (or the absence of the header)
+of "supported" indicates support whereas a value of "unsupported" (or the absence of the header)
 indicates lack of support.
 
 Clients MUST NOT indicate support for this extension unless they know that the
@@ -84,18 +84,13 @@ If a client supports this extension and HTTP/3 datagrams
 {{!H3DGRAM=I-D.schinazi-quic-h3-datagram}}, it can attempt to use datagrams for
 ECN information. This is done by allocating four datagram flow identifiers (as
 opposed to one in traditional CONNECT-UDP) and communicating them to the proxy
-using named elements on the "Datagram-Flow-Id" header. These names are
-"ecn-ect0", "ecn-ect1", and "ecn-ce". For example:
+using REGISTER_DATAGRAM_FLOW_ID HTTP/3 frames. These frames carry the ECN
+header with values that allow differentiating between ECN codepoints. The values
+are "ect0", "ect1", and "ce". For example:
 
 ~~~
-  Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
+  ECN = ect0
 ~~~
-
-If the proxy wishes to support datagram encoding of this extension, it echoes
-those named elements in its CONNECT-UDP response. The unnamed element now
-represents Not-ECT, whereas the one in "ecn-ect0" represents ECT(0), "ecn-ect1"
-represents ECT(1) and "ecn-ce" represents CE; see Section 5 of {{ECN}} for the
-definition of these IP header fields.
 
 When the proxy receives a datagram from the given flow identifier, it sets
 the IP packet's ECN bits accordingly on the UDP packet it sends to the target.
@@ -105,27 +100,7 @@ were seen on the UDP packets received from the target.
 
 # Stream Encoding of Proxied UDP Packets {#stream-encoding}
 
-If HTTP/3 datagrams are not supported, the stream is used to convey UDP
-payloads, and the CONNECT-UDP Stream Chunk Type is used to indicate the values
-of the ECN bits, as defined below:
-
-~~~
-  +-------+-----------------+-----------+
-  | Value |      Type       | ECN Field |
-  +-------+-----------------+-----------+
-  | 0x00  | UDP_PACKET      |  Not-ECT  |
-  +-------+-----------------+-----------+
-  | 0x31  | UDP_PACKET_ECT0 |  ECT(0)   |
-  +-------+-----------------+-----------+
-  | 0x32  | UDP_PACKET_ECT1 |  ECT(1)   |
-  +-------+-----------------+-----------+
-  | 0x33  | UDP_PACKET_CE   |  CE       |
-  +-------+-----------------+-----------+
-~~~
-
-The proxy then uses the the CONNECT-UDP Stream Chunk Type on received UDP
-payloads to set the ECN bits on the IP packets it sends to the target, and
-in the reverse direction to indicate which ECN bits received from the target.
+The RELIABLE_DATAGRAM HTTP/3 frame can be used to convey UDP payloads.
 
 
 # HTTP Intermediaries {#intermediaries}
@@ -137,10 +112,9 @@ connections if there are HTTP intermediaries involved; see Section 2.3 of
 
 Intermediaries that support this extension and HTTP/3 datagrams MUST negotiate
 all four flow identifiers separately on the client-facing and server-facing
-connections. This is accomplished by having the intermediary parse the unnamed
-element and the "ecn-ect0", "ecn-ect1", and "ecn-ce" named elements in the
-"Datagram-Flow-Id" header on all CONNECT-UDP requests it receives, and sending
-the same four flow identifiers in the "Datagram-Flow-Id" header on the response.
+connections. This is accomplished by having the intermediary parse the
+REGISTER_DATAGRAM_FLOW_ID frames it receives on all CONNECT-UDP streams, and sending
+the same four flow identifiers in the REGISTER_DATAGRAM_FLOW_ID in the reverse direction.
 
 Intermediaries MUST NOT send the "ECN" header with a value of 1 to the client
 on its response unless it has received that same value in the response it
@@ -167,43 +141,6 @@ This document will request IANA to register the "ECN" header in the
   +-------------------+----------+--------+---------------+
   |        ECN        |   http   |  std   | This document |
   +-------------------+----------+--------+---------------+
-~~~
-
-
-## Flow Identifier Parameters {#iana-params}
-
-This document will request IANA to register the "ecn-ect0", "ecn-ect1", and
-"ecn-ce" flow identifier parameters in the "HTTP Datagram Flow Identifier
-Parameters" registry (see {{H3DGRAM}}):
-
-~~~
-  +----------+-------------------------+---------+---------------+
-  |   Key    |       Description       | Is Name |   Reference   |
-  +----------+-------------------------+---------+---------------+
-  | ecn-ect0 | UDP payload with ECT(0) |   Yes   | This document |
-  +----------+-------------------------+---------+---------------+
-  | ecn-ect1 | UDP payload with ECT(1) |   Yes   | This document |
-  +----------+-------------------------+---------+---------------+
-  | ecn-ce   | UDP payload with CE     |   Yes   | This document |
-  +----------+-------------------------+---------+---------------+
-~~~
-
-
-## Stream Chunk Type Registration {#iana-chunk-type}
-
-This document will request IANA to register the following entry in the
-"CONNECT-UDP Stream Chunk Type" registry {{CONNECT-UDP}}:
-
-~~~
-  +-------+-----------------+-------------------------+---------------+
-  | Value |      Type       |       Description       |   Reference   |
-  +-------+-----------------+-------------------------+---------------+
-  | 0x31  | UDP_PACKET_ECT0 | UDP payload with ECT(0) | This document |
-  +-------+-----------------+-------------------------+---------------+
-  | 0x32  | UDP_PACKET_ECT1 | UDP payload with ECT(1) | This document |
-  +-------+-----------------+-------------------------+---------------+
-  | 0x33  | UDP_PACKET_CE   | UDP payload with CE     | This document |
-  +-------+-----------------+-------------------------+---------------+
 ~~~
 
 

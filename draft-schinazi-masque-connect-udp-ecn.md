@@ -56,15 +56,15 @@ when, and only when, they appear in all capitals, as shown here.
 # ECN Header Definition {#header}
 
 "ECN" is a Item Structured Header
-{{!STRUCT-HDR=I-D.ietf-httpbis-header-structure}}. Its value MUST be a Token.
+{{!STRUCT-HDR=I-D.ietf-httpbis-header-structure}}. Its value MUST be a Boolean.
 Its ABNF is:
 
 ~~~
-  ECN = sf-token
+  ECN = sf-boolean
 ~~~
 
 The "ECN" header indicates whether the sender supports this extension. A value
-of "supported" indicates support whereas a value of "unsupported" (or the absence of the header)
+of 1 indicates support whereas a value of 0 (or the absence of the header)
 indicates lack of support.
 
 Clients MUST NOT indicate support for this extension unless they know that the
@@ -84,12 +84,12 @@ If a client supports this extension and HTTP/3 datagrams
 {{!H3DGRAM=I-D.schinazi-quic-h3-datagram}}, it can attempt to use datagrams for
 ECN information. This is done by allocating four datagram flow identifiers (as
 opposed to one in traditional CONNECT-UDP) and communicating them to the proxy
-using REGISTER_DATAGRAM_FLOW_ID HTTP/3 frames. These frames carry the ECN
-header with values that allow differentiating between ECN codepoints. The values
-are "ect0", "ect1", and "ce". For example:
+using REGISTER_DATAGRAM_FLOW_ID HTTP/3 frames. These frames carry the "ecn" key
+in their Extension String with values that allow differentiating between ECN
+codepoints. The values are "ect0", "ect1", and "ce". For example:
 
 ~~~
-  ECN = ect0
+  ecn=ect0
 ~~~
 
 When the proxy receives a datagram from the given flow identifier, it sets

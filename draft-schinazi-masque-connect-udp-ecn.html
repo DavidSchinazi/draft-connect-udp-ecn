@@ -7,46 +7,212 @@
 <title>An ECN Extension to CONNECT-UDP</title>
 <meta content="David Schinazi" name="author">
 <meta content="
-       The CONNECT-UDP method allows proxying UDP packets over HTTP. This document
-describes an extension to CONNECT-UDP that allows conveying ECN information on
-proxied UDP packets. 
-       Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
-( masque@ietf.org ) or on the GitHub repository which
-contains the draft:  . 
+       CONNECT-UDP allows proxying UDP packets over HTTP. This document describes an
+extension to CONNECT-UDP that allows conveying ECN information on proxied UDP
+packets. 
     " name="description">
-<meta content="xml2rfc 3.5.0" name="generator">
+<meta content="xml2rfc 3.12.3" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-schinazi-masque-connect-udp-ecn-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.5.0
-    Python 3.8.5
+  xml2rfc 3.12.3
+    Python 3.9.7
     appdirs 1.4.4
-    ConfigArgParse 1.2.3
-    google-i18n-address 2.4.0
+    ConfigArgParse 1.3
+    google-i18n-address 2.5.0
     html5lib 1.1
-    intervaltree 3.0.2
-    Jinja2 2.11.2
+    intervaltree 3.1.0
+    Jinja2 2.11.3
     kitchen 1.2.6
-    lxml 4.5.0
-    pycountry 19.8.18
-    pyflakes 2.1.1
-    PyYAML 5.3.1
-    requests 2.22.0
-    setuptools 45.2.0
-    six 1.14.0
+    lxml 4.6.5
+    MarkupSafe 2.0.1
+    pycountry 20.7.3
+    pyflakes 2.3.1
+    PyYAML 5.4.1
+    requests 2.26.0
+    setuptools 52.0.0
+    six 1.16.0
 -->
 <link href="draft-schinazi-masque-connect-udp-ecn.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
-<style type="text/css">@import url('https://martinthomson.github.io/i-d-template/fonts.css');
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
-html {
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
   --background-color: #fff;
   --text-color: #222;
   --title-color: #191919;
   --link-color: #2a6496;
   --highlight-color: #f9f9f9;
   --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
   --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
 }
 body {
   max-width: 600px;
@@ -63,19 +229,25 @@ body {
 }
 
 /* headings */
-#title, h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: "Cabin Condensed", sans-serif;
   font-weight: 600;
   margin: 0.8em 0 0.3em;
   font-size-adjust: 0.5;
   color: var(--title-color);
 }
-#title {
-  padding: 1em 0 0.2em;
+h1#title {
   font-size: 32px;
   line-height: 40px;
   clear: both;
 }
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
 h1, h2, h3 {
   font-size: 22px;
   line-height: 27px;
@@ -89,10 +261,15 @@ h4, h5, h6 {
 .author {
   padding-bottom: 0.3em;
 }
-#abstract+p, #abstract+p code, #abstract+p samp, #abstract+p tt {
+#abstract+p {
   font-size: 18px;
   line-height: 24px;
 }
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
 p {
   padding: 0;
   margin: 0.5em 0;
@@ -128,6 +305,10 @@ div {
 }
 svg {
   display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
 }
 .alignCenter.art-text {
   background-color: var(--highlight-color);
@@ -223,7 +404,13 @@ a.xref {
 /* Figures */
 tt, code, pre {
   background-color: var(--highlight-color);
-  font: 14px/22px 'Oxygen Mono', monospace;
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines */
+  line-height: 0;
 }
 pre {
   border: 1px solid var(--line-color);
@@ -249,24 +436,25 @@ figcaption, caption {
   text-align: left;
 }
 @media screen {
-  pre {
+  pre, svg {
     display: inline-block;
     overflow-x: auto;
+  }
+  pre {
     max-width: 100%;
     width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
   }
   figure pre {
     display: block;
     width: calc(100% - 25px);
   }
-  pre + .pilcrow {
+  pre + .pilcrow, svg + .pilcrow {
     display: inline-block;
     vertical-align: text-bottom;
     padding-bottom: 8px;
-  }
-  table {
-    display: inline-block;
-    overflow-x: auto;
   }
 }
 
@@ -277,9 +465,6 @@ aside, blockquote {
   font-style: italic;
 }
 blockquote {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
   margin: 1em 0;
 }
 cite {
@@ -338,17 +523,23 @@ table p {
 /* pilcrow */
 a.pilcrow {
   margin-left: 3px;
-  visibility: hidden;
+  opacity: 0.2;
   user-select: none;
 }
-a.pilcrow[href] { color: #ddd; }
+a.pilcrow[href] { color: var(--pilcrow-weak); }
 a.pilcrow[href]:hover { text-decoration: none; }
-@media screen {
+@media not print {
   :hover > a.pilcrow {
-    visibility: visible;
+    opacity: 1;
   }
-  a.pilcrow:hover {
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
     background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
   }
 }
 
@@ -444,36 +635,8 @@ hr {
 }
 
 /* index */
-.index ul {
-  margin: 0 0 0 1em;
-  padding: 0;
-  list-style: none;
-}
-.index ul ul {
-  margin: 0;
-}
-.index li {
-  margin: 0;
-  text-indent: -2em;
-  padding-left: 2em;
-  padding-bottom: 5px;
-}
-.indexIndex {
-  margin: 0.5em 0 1em;
-}
-.index a {
-  font-weight: 700;
-}
-/* make the index two-column on all but the smallest screens */
-@media (min-width: 500px) {
-  .index ul {
-    column-count: 2;
-    column-gap: 20px;
-  }
-  .index ul ul {
-    column-count: 1;
-    column-gap: 0;
-  }
+#rfc\.index\.index + ul {
+  margin-left: 0;
 }
 
 /* authors */
@@ -816,6 +979,34 @@ address div.right {
   font-weight: bold;
   font-size: 0.9em;
 }
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+/* Trick: a prefix match works because only black and white are allowed */
+svg [stroke="black"], svg [stroke^="#000"] {
+  stroke: var(--text-color);
+}
+svg [stroke="white"], svg [stroke^="#fff"] {
+  stroke: var(--background-color);
+}
+svg [fill="black"], svg [fill^="#000"], svg :not([fill]) {
+  fill: var(--text-color);
+}
+svg [stroke="fill"], svg [fill^="#fff"] {
+  fill: var(--background-color);
+}
+}
 </style>
 
 </head>
@@ -824,11 +1015,11 @@ address div.right {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">CONNECT-UDP ECN Extension</td>
-<td class="right">January 2021</td>
+<td class="right">March 2022</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Schinazi</td>
-<td class="center">Expires 9 July 2021</td>
+<td class="center">Expires 29 September 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -836,17 +1027,17 @@ address div.right {
 <div id="internal-metadata" class="document-information">
 <dl id="identifiers">
 <dt class="label-workgroup">Workgroup:</dt>
-<dd class="workgroup">Network Working Group</dd>
+<dd class="workgroup">MASQUE</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
 <dd class="internet-draft">draft-schinazi-masque-connect-udp-ecn-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-01-05" class="published">5 January 2021</time>
+<time datetime="2022-03-28" class="published">28 March 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-07-09">9 July 2021</time></dd>
+<dd class="expires"><time datetime="2022-09-29">29 September 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -859,12 +1050,9 @@ address div.right {
 <h1 id="title">An ECN Extension to CONNECT-UDP</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">The CONNECT-UDP method allows proxying UDP packets over HTTP. This document
-describes an extension to CONNECT-UDP that allows conveying ECN information on
-proxied UDP packets.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
-(<a href="mailto:masque@ietf.org">masque@ietf.org</a>) or on the GitHub repository which
-contains the draft: <span><a href="https://github.com/DavidSchinazi/draft-connect-udp-ecn">https://github.com/DavidSchinazi/draft-connect-udp-ecn</a></span>.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">CONNECT-UDP allows proxying UDP packets over HTTP. This document describes an
+extension to CONNECT-UDP that allows conveying ECN information on proxied UDP
+packets.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-discussion-venues">
@@ -893,7 +1081,7 @@ contains the draft: <span><a href="https://github.com/DavidSchinazi/draft-connec
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 September 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -902,7 +1090,7 @@ contains the draft: <span><a href="https://github.com/DavidSchinazi/draft-connec
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2021 IETF Trust and the persons identified as the
+            Copyright (c) 2022 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -911,9 +1099,9 @@ contains the draft: <span><a href="https://github.com/DavidSchinazi/draft-connec
             publication of this document. Please review these documents
             carefully, as they describe your rights and restrictions with
             respect to this document. Code Components extracted from this
-            document must include Simplified BSD License text as described in
+            document must include Revised BSD License text as described in
             Section 4.e of the Trust Legal Provisions and are provided without
-            warranty as described in the Simplified BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="toc">
@@ -921,52 +1109,41 @@ contains the draft: <span><a href="https://github.com/DavidSchinazi/draft-connec
         <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
 <a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
         </h2>
-<nav class="toc"><ul class="toc ulEmpty compact">
-<li class="toc ulEmpty compact" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a><a href="#section-toc.1-1.1.1" class="pilcrow">¶</a></p>
-<ul class="toc ulEmpty compact">
-<li class="toc ulEmpty compact" id="section-toc.1-1.1.2.1">
-                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-conventions-and-definitions" class="xref">Conventions and Definitions</a><a href="#section-toc.1-1.1.2.1.1" class="pilcrow">¶</a></p>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-conventions-and-definitions" class="xref">Conventions and Definitions</a></p>
 </li>
             </ul>
 </li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-ecn-header-definition" class="xref">ECN Header Definition</a><a href="#section-toc.1-1.2.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-context-identifiers" class="xref">Context Identifiers</a></p>
 </li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-datagram-encoding-of-proxie" class="xref">Datagram Encoding of Proxied UDP Packets</a><a href="#section-toc.1-1.3.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-ecn-header-definition" class="xref">ECN Header Definition</a></p>
 </li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-stream-encoding-of-proxied-" class="xref">Stream Encoding of Proxied UDP Packets</a><a href="#section-toc.1-1.4.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-encoding-of-ecn-bits" class="xref">Encoding of ECN bits</a></p>
 </li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-http-intermediaries" class="xref">HTTP Intermediaries</a><a href="#section-toc.1-1.5.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-a-note-about-future-extensi" class="xref">A Note about Future Extensions</a></p>
 </li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-security-considerations" class="xref">Security Considerations</a><a href="#section-toc.1-1.6.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
 </li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a><a href="#section-toc.1-1.7.1" class="pilcrow">¶</a></p>
-<ul class="toc ulEmpty compact">
-<li class="toc ulEmpty compact" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>.  <a href="#name-http-header" class="xref">HTTP Header</a><a href="#section-toc.1-1.7.2.1.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
 </li>
-              <li class="toc ulEmpty compact" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>.  <a href="#name-flow-identifier-parameters" class="xref">Flow Identifier Parameters</a><a href="#section-toc.1-1.7.2.2.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
 </li>
-              <li class="toc ulEmpty compact" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="xref">7.3</a>.  <a href="#name-stream-chunk-type-registrat" class="xref">Stream Chunk Type Registration</a><a href="#section-toc.1-1.7.2.3.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgments" class="xref">Acknowledgments</a></p>
 </li>
-            </ul>
-</li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-normative-references" class="xref">Normative References</a><a href="#section-toc.1-1.8.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-appendix.a" class="xref"></a><a href="#name-acknowledgments" class="xref">Acknowledgments</a><a href="#section-toc.1-1.9.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="toc ulEmpty compact" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-appendix.b" class="xref"></a><a href="#name-authors-address" class="xref">Author's Address</a><a href="#section-toc.1-1.10.1" class="pilcrow">¶</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-address" class="xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -977,125 +1154,153 @@ contains the draft: <span><a href="https://github.com/DavidSchinazi/draft-connec
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">The CONNECT-UDP <span>[<a href="#CONNECT-UDP" class="xref">CONNECT-UDP</a>]</span> method allows
-proxying UDP packets over HTTP. This document describes an extension to
-CONNECT-UDP that allows conveying ECN <span>[<a href="#ECN" class="xref">ECN</a>]</span> information on proxied
-UDP packets.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">Discussion of this work is encouraged to happen on the MASQUE IETF mailing list
-(<a href="mailto:masque@ietf.org">masque@ietf.org</a>) or on the GitHub repository which
-contains the draft: <span><a href="https://github.com/DavidSchinazi/draft-connect-udp-ecn">https://github.com/DavidSchinazi/draft-connect-udp-ecn</a></span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-1">CONNECT-UDP <span>[<a href="#CONNECT-UDP" class="xref">CONNECT-UDP</a>]</span> allows proxying UDP
+packets over HTTP. This document describes an extension to CONNECT-UDP that
+allows conveying ECN <span>[<a href="#ECN" class="xref">ECN</a>]</span> information on proxied UDP packets.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <div id="defs">
 <section id="section-1.1">
         <h3 id="name-conventions-and-definitions">
 <a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
         </h3>
-<p id="section-1.1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span>
-when, and only when, they appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
+</section>
+</div>
+<div id="context-identifiers">
+<section id="section-2">
+      <h2 id="name-context-identifiers">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-context-identifiers" class="section-name selfRef">Context Identifiers</a>
+      </h2>
+<p id="section-2-1">The "Context Identifiers" section of <span>[<a href="#CONNECT-UDP" class="xref">CONNECT-UDP</a>]</span> defines the concept of
+context IDs and how they can be used to extend CONNECT-UDP. When a client wishes
+to use ECN with CONNECT-UDP, it generates an unique client-allocated context ID.
+In this document, we'll refer to that context ID as the "chosen context ID".
+Note that, by definition of client-allocated context IDs, the chosen context ID
+will always be a non-zero even number. We also add the restriction that the
+chosen context ID <span class="bcp14">MUST</span> be strictly less than 10<sup>15</sup>. If the client has
+run out of available context ID values that match this requirement for this
+CONNECT-UDP request, it <span class="bcp14">MUST NOT</span> use the ECN extension with this CONNECT-UDP
+request.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="header">
-<section id="section-2">
-      <h2 id="name-ecn-header-definition">
-<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-ecn-header-definition" class="section-name selfRef">ECN Header Definition</a>
-      </h2>
-<p id="section-2-1">"ECN" is a Item Structured Header
-<span>[<a href="#STRUCT-HDR" class="xref">STRUCT-HDR</a>]</span>. Its value MUST be a Boolean.
-Its ABNF is:<a href="#section-2-1" class="pilcrow">¶</a></p>
-<div class="artwork art-text alignLeft" id="section-2-2">
-<pre>
-  ECN = sf-boolean
-</pre><a href="#section-2-2" class="pilcrow">¶</a>
-</div>
-<p id="section-2-3">The "ECN" header indicates whether the sender supports this extension. A value
-of 1 indicates support whereas a value of 0 (or the absence of the header)
-indicates lack of support.<a href="#section-2-3" class="pilcrow">¶</a></p>
-<p id="section-2-4">Clients MUST NOT indicate support for this extension unless they know that the
-protocol running over UDP that is being proxied supports ECN, and will react
-appropriately to Congestion Experienced (CE) markings.<a href="#section-2-4" class="pilcrow">¶</a></p>
-<p id="section-2-5">Proxies MUST NOT indicate support for this extension unless they know they
-have the ability to read and write the IP ECN bits on its target-bound UDP
-sockets.<a href="#section-2-5" class="pilcrow">¶</a></p>
-<p id="section-2-6">This extension is said to have been negotiated when both client and proxy
-indicated support for it in their CONNECT-UDP request and response.<a href="#section-2-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="datagram-encoding">
 <section id="section-3">
-      <h2 id="name-datagram-encoding-of-proxie">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-datagram-encoding-of-proxie" class="section-name selfRef">Datagram Encoding of Proxied UDP Packets</a>
+      <h2 id="name-ecn-header-definition">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-ecn-header-definition" class="section-name selfRef">ECN Header Definition</a>
       </h2>
-<p id="section-3-1">If a client supports this extension and HTTP/3 datagrams
-<span>[<a href="#H3DGRAM" class="xref">H3DGRAM</a>]</span>, it can attempt to use datagrams for
-ECN information. This is done by allocating four datagram flow identifiers (as
-opposed to one in traditional CONNECT-UDP) and communicating them to the proxy
-using named elements on the "Datagram-Flow-Id" header. These names are
-"ecn-ect0", "ecn-ect1", and "ecn-ce". For example:<a href="#section-3-1" class="pilcrow">¶</a></p>
-<div class="artwork art-text alignLeft" id="section-3-2">
+<p id="section-3-1">The "ECN" header field is an Item Structured Field, see <span><a href="https://rfc-editor.org/rfc/rfc8941#section-3.3" class="relref">Section 3.3</a> of [<a href="#STRUCT-FIELD" class="xref">STRUCT-FIELD</a>]</span>; its value <span class="bcp14">MUST</span> be a Integer; any other value type <span class="bcp14">MUST</span>
+be handled as if the field were not present by recipients (for example, if this
+field is included multiple times, its type will become a List and the field will
+therefore be ignored). This document does not define any parameters for the
+"ECN" header field value, but future documents might define parameters.
+Receivers <span class="bcp14">MUST</span> ignore unknown parameters.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">When present, the "ECN" header indicates that the sender supports this
+extension, and communicates the chosen context ID as the "ECN" field value.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">For example, if the client chosen context ID is 42, it would send the following:<a href="#section-3-3" class="pilcrow">¶</a></p>
+<span id="name-example-client-ecn-field"></span><div id="example-header-client">
+<figure id="figure-1">
+        <div class="alignLeft art-text artwork" id="section-3-4.1">
 <pre>
-  Datagram-Flow-Id = 42, 44; ecn-ect0, 46; ecn-ect1, 48; ecn-ce
-</pre><a href="#section-3-2" class="pilcrow">¶</a>
+ECN: 42; foo=bar
+</pre>
 </div>
-<p id="section-3-3">If the proxy wishes to support datagram encoding of this extension, it echoes
-those named elements in its CONNECT-UDP response. The unnamed element now
-represents Not-ECT, whereas the one in "ecn-ect0" represents ECT(0), "ecn-ect1"
-represents ECT(1) and "ecn-ce" represents CE; see Section 5 of <span>[<a href="#ECN" class="xref">ECN</a>]</span> for the
-definition of these IP header fields.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">When the proxy receives a datagram from the given flow identifier, it sets
-the IP packet's ECN bits accordingly on the UDP packet it sends to the target.
-Similarly, in the other direction the flow identifier represents which ECN bits
-were seen on the UDP packets received from the target.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-example-client-ecn-field" class="selfRef">Example Client ECN Field</a>
+        </figcaption></figure>
+</div>
+<p id="section-3-5">Clients <span class="bcp14">MUST NOT</span> indicate support for this extension unless they know that the
+protocol running over UDP that is being proxied supports ECN, and will react
+appropriately to Congestion Experienced (CE) markings.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-6">Proxies <span class="bcp14">MUST NOT</span> indicate support for this extension unless they know they
+have the ability to read and write the IP ECN bits on its target-bound UDP
+sockets.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">This extension is said to have been negotiated when both client and proxy
+indicated support for it in their CONNECT-UDP request and response. When
+indicating support for this extension, the proxy send the client's chosen
+context ID as the "ECN" field value.<a href="#section-3-7" class="pilcrow">¶</a></p>
+<p id="section-3-8">For example, the proxy could reply with:<a href="#section-3-8" class="pilcrow">¶</a></p>
+<span id="name-example-proxy-ecn-field"></span><div id="example-header-proxy">
+<figure id="figure-2">
+        <div class="alignLeft art-text artwork" id="section-3-9.1">
+<pre>
+ECN: 42
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-example-proxy-ecn-field" class="selfRef">Example Proxy ECN Field</a>
+        </figcaption></figure>
+</div>
 </section>
 </div>
-<div id="stream-encoding">
+<div id="encoding-of-ecn-bits">
 <section id="section-4">
-      <h2 id="name-stream-encoding-of-proxied-">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-stream-encoding-of-proxied-" class="section-name selfRef">Stream Encoding of Proxied UDP Packets</a>
+      <h2 id="name-encoding-of-ecn-bits">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-encoding-of-ecn-bits" class="section-name selfRef">Encoding of ECN bits</a>
       </h2>
-<p id="section-4-1">If HTTP/3 datagrams are not supported, the stream is used to convey UDP
-payloads, and the CONNECT-UDP Stream Chunk Type is used to indicate the values
-of the ECN bits, as defined below:<a href="#section-4-1" class="pilcrow">¶</a></p>
-<div class="artwork art-text alignLeft" id="section-4-2">
+<p id="section-4-1">When an HTTP Datagram <span>[<a href="#HTTP-DGRAM" class="xref">HTTP-DGRAM</a>]</span> associated
+with a CONNECT-UDP stream uses the chosen context ID as its context ID, its
+"Payload" field contains the following format (using the notation from the
+"Notational Conventions" section of <span>[<a href="#QUIC" class="xref">QUIC</a>]</span>):<a href="#section-4-1" class="pilcrow">¶</a></p>
+<span id="name-connect-udp-payload-with-ec"></span><div id="payload-format">
+<figure id="figure-3">
+        <div class="alignLeft art-text artwork" id="section-4-2.1">
 <pre>
-  +-------+-----------------+-----------+
-  | Value |      Type       | ECN Field |
-  +-------+-----------------+-----------+
-  | 0x00  | UDP_PACKET      |  Not-ECT  |
-  +-------+-----------------+-----------+
-  | 0x31  | UDP_PACKET_ECT0 |  ECT(0)   |
-  +-------+-----------------+-----------+
-  | 0x32  | UDP_PACKET_ECT1 |  ECT(1)   |
-  +-------+-----------------+-----------+
-  | 0x33  | UDP_PACKET_CE   |  CE       |
-  +-------+-----------------+-----------+
-</pre><a href="#section-4-2" class="pilcrow">¶</a>
+CONNECT-UDP Payload with ECN {
+  Must be Zero (6),
+  ECN Bits (2),
+  UDP Payload (..),
+}
+</pre>
 </div>
-<p id="section-4-3">The proxy then uses the the CONNECT-UDP Stream Chunk Type on received UDP
-payloads to set the ECN bits on the IP packets it sends to the target, and
-in the reverse direction to indicate which ECN bits received from the target.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-connect-udp-payload-with-ec" class="selfRef">CONNECT-UDP Payload with ECN</a>
+        </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-4-3">
+        <dt id="section-4-3.1">Must be Zero:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-3.2">
+          <p id="section-4-3.2.1">6 bits that <span class="bcp14">MUST</span> be sent as zero. Receivers <span class="bcp14">MUST</span> validate that these bits are
+zero and <span class="bcp14">MUST</span> silently drop the HTTP Datagram if they have any other value.
+Extensions to this mechanism <span class="bcp14">MAY</span> relax this requirement.<a href="#section-4-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-3.3">ECN Bits:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-3.4">
+          <p id="section-4-3.4.1">The ECN bits, sent in the same order as they appear in the IP header.<a href="#section-4-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-4-3.5">UDP Payload:</dt>
+        <dd style="margin-left: 1.5em" id="section-4-3.6">
+          <p id="section-4-3.6.1">The UDP Payload, as defined in the "HTTP Datagram Payload Format" section of
+<span>[<a href="#CONNECT-UDP" class="xref">CONNECT-UDP</a>]</span>.<a href="#section-4-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-4-4">When the proxy receives a datagram with the chosen context ID, it sets the IP
+packet's ECN bits accordingly on the UDP packet it sends to the target.
+Similarly, in the other direction the ECN Bits field represents which ECN bits
+were seen on the UDP packets received from the target.<a href="#section-4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="intermediaries">
+<div id="note">
 <section id="section-5">
-      <h2 id="name-http-intermediaries">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-http-intermediaries" class="section-name selfRef">HTTP Intermediaries</a>
+      <h2 id="name-a-note-about-future-extensi">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-a-note-about-future-extensi" class="section-name selfRef">A Note about Future Extensions</a>
       </h2>
-<p id="section-5-1">HTTP/3 DATAGRAM flow identifiers are specific to a given HTTP/3 connection.
-However, in some cases, an HTTP request may travel across multiple HTTP
-connections if there are HTTP intermediaries involved; see Section 2.3 of
-<span>[<a href="#RFC7230" class="xref">RFC7230</a>]</span>.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">Intermediaries that support this extension and HTTP/3 datagrams MUST negotiate
-all four flow identifiers separately on the client-facing and server-facing
-connections. This is accomplished by having the intermediary parse the unnamed
-element and the "ecn-ect0", "ecn-ect1", and "ecn-ce" named elements in the
-"Datagram-Flow-Id" header on all CONNECT-UDP requests it receives, and sending
-the same four flow identifiers in the "Datagram-Flow-Id" header on the response.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3">Intermediaries MUST NOT send the "ECN" header with a value of 1 to the client
-on its response unless it has received that same value in the response it
-received from the server.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-1">This CONNECT-UDP extension uses an HTTP field to register its chosen context ID.
+Future extensions to CONNECT-UDP can use the same strategy to register their
+chosen context ID(s) via another HTTP field. This strategy is best for
+CONNECT-UDP extensions that only need to register context IDs during the HTTP
+request and response.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">Some extensions may need to register context IDs after the request and response
+have been exchanged, for example an extension that wishes to compress QUIC
+connection IDs <span>[<a href="#QUIC" class="xref">QUIC</a>]</span> is not aware of all connection IDs at request time. In
+such cases, extensions can use new Capsule Types (see <span>[<a href="#HTTP-DGRAM" class="xref">HTTP-DGRAM</a>]</span>) to perform
+context ID registration.<a href="#section-5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security">
@@ -1112,70 +1317,35 @@ defined in <span>[<a href="#CONNECT-UDP" class="xref">CONNECT-UDP</a>]</span>.<a
       <h2 id="name-iana-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<div id="iana-header">
-<section id="section-7.1">
-        <h3 id="name-http-header">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-http-header" class="section-name selfRef">HTTP Header</a>
-        </h3>
-<p id="section-7.1-1">This document will request IANA to register the "ECN" header in the
-"Permanent Message Header Field Names" registry maintained at
-&lt;<span><a href="https://www.iana.org/assignments/message-headers">https://www.iana.org/assignments/message-headers</a></span>&gt;.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<div class="artwork art-text alignLeft" id="section-7.1-2">
-<pre>
-  +-------------------+----------+--------+---------------+
-  | Header Field Name | Protocol | Status |   Reference   |
-  +-------------------+----------+--------+---------------+
-  |        ECN        |   http   |  std   | This document |
-  +-------------------+----------+--------+---------------+
-</pre><a href="#section-7.1-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="iana-params">
-<section id="section-7.2">
-        <h3 id="name-flow-identifier-parameters">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-flow-identifier-parameters" class="section-name selfRef">Flow Identifier Parameters</a>
-        </h3>
-<p id="section-7.2-1">This document will request IANA to register the "ecn-ect0", "ecn-ect1", and
-"ecn-ce" flow identifier parameters in the "HTTP Datagram Flow Identifier
-Parameters" registry (see <span>[<a href="#H3DGRAM" class="xref">H3DGRAM</a>]</span>):<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<div class="artwork art-text alignLeft" id="section-7.2-2">
-<pre>
-  +----------+-------------------------+---------+---------------+
-  |   Key    |       Description       | Is Name |   Reference   |
-  +----------+-------------------------+---------+---------------+
-  | ecn-ect0 | UDP payload with ECT(0) |   Yes   | This document |
-  +----------+-------------------------+---------+---------------+
-  | ecn-ect1 | UDP payload with ECT(1) |   Yes   | This document |
-  +----------+-------------------------+---------+---------------+
-  | ecn-ce   | UDP payload with CE     |   Yes   | This document |
-  +----------+-------------------------+---------+---------------+
-</pre><a href="#section-7.2-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="iana-chunk-type">
-<section id="section-7.3">
-        <h3 id="name-stream-chunk-type-registrat">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-stream-chunk-type-registrat" class="section-name selfRef">Stream Chunk Type Registration</a>
-        </h3>
-<p id="section-7.3-1">This document will request IANA to register the following entry in the
-"CONNECT-UDP Stream Chunk Type" registry <span>[<a href="#CONNECT-UDP" class="xref">CONNECT-UDP</a>]</span>:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<div class="artwork art-text alignLeft" id="section-7.3-2">
-<pre>
-  +-------+-----------------+-------------------------+---------------+
-  | Value |      Type       |       Description       |   Reference   |
-  +-------+-----------------+-------------------------+---------------+
-  | 0x31  | UDP_PACKET_ECT0 | UDP payload with ECT(0) | This document |
-  +-------+-----------------+-------------------------+---------------+
-  | 0x32  | UDP_PACKET_ECT1 | UDP payload with ECT(1) | This document |
-  +-------+-----------------+-------------------------+---------------+
-  | 0x33  | UDP_PACKET_CE   | UDP payload with CE     | This document |
-  +-------+-----------------+-------------------------+---------------+
-</pre><a href="#section-7.3-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
+<p id="section-7-1">This document will request IANA to register the following entry in the "HTTP
+Field Name" registry:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-2">
+        <dt id="section-7-2.1">Field Name:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.2">
+          <p id="section-7-2.2.1">ECN<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.3">Template:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.4">
+          <p id="section-7-2.4.1">None<a href="#section-7-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.5">Status:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.6">
+          <p id="section-7-2.6.1">provisional (permanent if this document is approved)<a href="#section-7-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.7">Reference:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.8">
+          <p id="section-7-2.8.1">This document<a href="#section-7-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.9">Comments:</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.10">
+          <p id="section-7-2.10.1">None<a href="#section-7-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
 </section>
 </div>
 <section id="section-8">
@@ -1185,45 +1355,45 @@ Parameters" registry (see <span>[<a href="#H3DGRAM" class="xref">H3DGRAM</a>]</s
 <dl class="references">
 <dt id="CONNECT-UDP">[CONNECT-UDP]</dt>
       <dd>
-<span class="refAuthor">Schinazi, D.</span>, <span class="refTitle">"The CONNECT-UDP HTTP Method"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-masque-connect-udp-02</span>, <time datetime="2020-12-30" class="refDate">30 December 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-ietf-masque-connect-udp-02.txt">http://www.ietf.org/internet-drafts/draft-ietf-masque-connect-udp-02.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Schinazi, D.</span>, <span class="refTitle">"UDP Proxying Support for HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-masque-connect-udp-08</span>, <time datetime="2022-03-21" class="refDate">21 March 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-masque-connect-udp-08">https://datatracker.ietf.org/doc/html/draft-ietf-masque-connect-udp-08</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="ECN">[ECN]</dt>
       <dd>
-<span class="refAuthor">Ramakrishnan, K.</span><span class="refAuthor">, Floyd, S.</span><span class="refAuthor">, and D. Black</span>, <span class="refTitle">"The Addition of Explicit Congestion Notification (ECN) to IP"</span>, <span class="seriesInfo">RFC 3168</span>, <span class="seriesInfo">DOI 10.17487/RFC3168</span>, <time datetime="2001-09" class="refDate">September 2001</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3168">https://www.rfc-editor.org/info/rfc3168</a>&gt;</span>. </dd>
+<span class="refAuthor">Ramakrishnan, K.</span>, <span class="refAuthor">Floyd, S.</span>, and <span class="refAuthor">D. Black</span>, <span class="refTitle">"The Addition of Explicit Congestion Notification (ECN) to IP"</span>, <span class="seriesInfo">RFC 3168</span>, <span class="seriesInfo">DOI 10.17487/RFC3168</span>, <time datetime="2001-09" class="refDate">September 2001</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3168">https://www.rfc-editor.org/rfc/rfc3168</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="H3DGRAM">[H3DGRAM]</dt>
+<dt id="HTTP-DGRAM">[HTTP-DGRAM]</dt>
       <dd>
-<span class="refAuthor">Schinazi, D.</span>, <span class="refTitle">"Using QUIC Datagrams with HTTP/3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-schinazi-quic-h3-datagram-05</span>, <time datetime="2020-10-12" class="refDate">12 October 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-schinazi-quic-h3-datagram-05.txt">http://www.ietf.org/internet-drafts/draft-schinazi-quic-h3-datagram-05.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Schinazi, D.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"HTTP Datagrams and the Capsule Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-masque-h3-datagram-08</span>, <time datetime="2022-03-28" class="refDate">28 March 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram-08">https://datatracker.ietf.org/doc/html/draft-ietf-masque-h3-datagram-08</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="QUIC">[QUIC]</dt>
+      <dd>
+<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
-<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC7230">[RFC7230]</dt>
-      <dd>
-<span class="refAuthor">Fielding, R., Ed.</span><span class="refAuthor"> and J. Reschke, Ed.</span>, <span class="refTitle">"Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing"</span>, <span class="seriesInfo">RFC 7230</span>, <span class="seriesInfo">DOI 10.17487/RFC7230</span>, <time datetime="2014-06" class="refDate">June 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7230">https://www.rfc-editor.org/info/rfc7230</a>&gt;</span>. </dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
       <dd>
-<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="STRUCT-HDR">[STRUCT-HDR]</dt>
+<dt id="STRUCT-FIELD">[STRUCT-FIELD]</dt>
     <dd>
-<span class="refAuthor">Nottingham, M.</span><span class="refAuthor"> and P. Kamp</span>, <span class="refTitle">"Structured Field Values for HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-header-structure-19</span>, <time datetime="2020-06-03" class="refDate">3 June 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-ietf-httpbis-header-structure-19.txt">http://www.ietf.org/internet-drafts/draft-ietf-httpbis-header-structure-19.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Nottingham, M.</span> and <span class="refAuthor">P-H. Kamp</span>, <span class="refTitle">"Structured Field Values for HTTP"</span>, <span class="seriesInfo">RFC 8941</span>, <span class="seriesInfo">DOI 10.17487/RFC8941</span>, <time datetime="2021-02" class="refDate">February 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8941">https://www.rfc-editor.org/rfc/rfc8941</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 <div id="acks">
-<section id="section-appendix.a">
+<section id="appendix-A">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="section-appendix.a-1">This proposal was inspired directly or indirectly by prior work from many
-people. The author would like to thank contributors the MASQUE working group.<a href="#section-appendix.a-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">This proposal was inspired directly or indirectly by prior work from many
+people. The author would like to thank contributors the MASQUE working group.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="section-appendix.b">
+<section id="appendix-B">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>

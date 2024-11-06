@@ -4,8 +4,8 @@
 
 MASQUE                                                       D. Schinazi
 Internet-Draft                                                Google LLC
-Intended status: Standards Track                           28 March 2022
-Expires: 29 September 2022
+Intended status: Standards Track                         6 November 2024
+Expires: 10 May 2025
 
 
                     An ECN Extension to CONNECT-UDP
@@ -39,11 +39,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 September 2022.
+   This Internet-Draft will expire on 10 May 2025.
 
 Copyright Notice
 
-   Copyright (c) 2022 IETF Trust and the persons identified as the
+   Copyright (c) 2024 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -209,10 +209,10 @@ Table of Contents
 8.  Normative References
 
    [CONNECT-UDP]
-              Schinazi, D., "UDP Proxying Support for HTTP", Work in
-              Progress, Internet-Draft, draft-ietf-masque-connect-udp-
-              08, 21 March 2022, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-masque-connect-udp-08>.
+              Schinazi, D., "Proxying UDP in HTTP", Work in Progress,
+              Internet-Draft, draft-ietf-masque-connect-udp-15, 17 June
+              2022, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              masque-connect-udp-15>.
 
    [ECN]      Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
               of Explicit Congestion Notification (ECN) to IP",
@@ -222,9 +222,9 @@ Table of Contents
    [HTTP-DGRAM]
               Schinazi, D. and L. Pardue, "HTTP Datagrams and the
               Capsule Protocol", Work in Progress, Internet-Draft,
-              draft-ietf-masque-h3-datagram-08, 28 March 2022,
+              draft-ietf-masque-h3-datagram-11, 17 June 2022,
               <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
-              h3-datagram-08>.
+              h3-datagram-11>.
 
    [QUIC]     Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", RFC 9000,
@@ -241,7 +241,7 @@ Table of Contents
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
    [STRUCT-FIELD]
-              Nottingham, M. and P-H. Kamp, "Structured Field Values for
+              Nottingham, M. and P. Kamp, "Structured Field Values for
               HTTP", RFC 8941, DOI 10.17487/RFC8941, February 2021,
               <https://www.rfc-editor.org/rfc/rfc8941>.
 

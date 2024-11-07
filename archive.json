@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2021-03-07T00:02:54.912756+00:00",
+  "timestamp": "2024-11-07T01:02:20.155210+00:00",
   "repo": "DavidSchinazi/draft-connect-udp-ecn",
   "labels": [
     {
@@ -24,14 +24,14 @@
       "color": "a2eeef"
     },
     {
-      "name": "help wanted",
-      "description": "Extra attention is needed",
-      "color": "008672"
-    },
-    {
       "name": "good first issue",
       "description": "Good for newcomers",
       "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
     },
     {
       "name": "invalid",
@@ -50,5 +50,32 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTk5MjgxMTMx",
+      "title": "Experiment with HTTP/3 frames",
+      "url": "https://github.com/DavidSchinazi/draft-connect-udp-ecn/pull/1",
+      "state": "OPEN",
+      "author": "DavidSchinazi",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR is a thought experiment aimed at seeing whether using HTTP/3 frames for H3DGRAM and CONNECT-UDP makes sense. We're not planning on merging this as-is.",
+      "createdAt": "2021-03-24T00:31:29Z",
+      "updatedAt": "2021-03-24T23:48:08Z",
+      "baseRepository": "DavidSchinazi/draft-connect-udp-ecn",
+      "baseRefName": "main",
+      "baseRefOid": "0739f5c73ccc1640f270d46f21254ea12b0b992f",
+      "headRepository": "DavidSchinazi/draft-connect-udp-ecn",
+      "headRefName": "experiment_h3_frames",
+      "headRefOid": "6f8f50c6a59b8106ca55b5825d81556a207661c7",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
